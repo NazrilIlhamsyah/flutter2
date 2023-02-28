@@ -1,11 +1,26 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
+import '../../dashboard/views/dashboard_view.dart';
+import '../../login/views/login_view.dart';
 
 class HomeController extends GetxController {
   //TODO: Implement HomeController
-
-  final count = 0.obs;
+  late Timer _pindah;
+  final authToken = GetStorage();
   @override
   void onInit() {
+    _pindah = Timer.periodic(
+      const Duration(seconds: 4),
+      (timer) => authToken.read('token') == null
+          ? Get.off(
+              () => LoginView(),
+              transition: Transition.leftToRight,
+            )
+          : Get.off(() => DashboardView()),
+    );
     super.onInit();
   }
 
@@ -15,6 +30,7 @@ class HomeController extends GetxController {
   }
 
   @override
-  void onClose() {}
-  void increment() => count.value++;
+  void onClose() {
+    _pindah.cancel();
+  }
 }
